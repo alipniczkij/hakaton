@@ -1,8 +1,12 @@
 import vk_api
+import psycopg2
 from vk_api.longpoll import VkLongPoll, VkEventType
 from classes import VkBot
 import random
 
+conn = psycopg2.connect(database="hack", user="postgres", host="100.100.153.231",
+                        port="5432", password="verepa40")
+cursor = conn.cursor()
 
 def write_msg(user_id, message):
     vk.method('messages.send', {'user_id': user_id, 'message': message, 'random_id': random.randint(0, 2048)})
