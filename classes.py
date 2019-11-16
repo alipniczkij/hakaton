@@ -63,6 +63,7 @@ class VkBot:
             user = User(user_id)
             session.add(user)
             session.commit()
+            self.send_message(user_id=user_id, messages="Здравствуйте " + self._get_user_name_from_vk_id(user_id))
 
     def save_massage(self, user_id, message):
         mes = Message(user_id, message)

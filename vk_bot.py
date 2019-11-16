@@ -28,7 +28,8 @@ def send(metric):
        s = socket.create_connection(('35.204.44.141', 2003))
        s.sendall(f'hackathon.team2.backend.cnt {metric.value} -1\n'.encode('utf-8'))
        print(metric.value)
-       sleep(10)
+       metric.value = 0
+       sleep(60)
 
 
 metric = Value('i', 0)
