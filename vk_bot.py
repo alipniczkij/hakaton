@@ -12,24 +12,15 @@ cursor = conn.cursor()
 keyboard = None
 
 
-
 token = '9becfa2210b0bbd028f47951ae253aa88c15fc26c6c938578980bdd472581fcaad29eab2afd0f7109f06f'
 vk = vk_api.VkApi(token=token)
 vk_mess = vk.get_api()
-bot = VkBot(event.user_id)
-
+bot = VkBot(vk_mess)
 longpoll = VkLongPoll(vk)
+
 
 for event in longpoll.listen():
     if event.type == VkEventType.MESSAGE_NEW:
         if event.to_me:
-            print(f'For me by: {event.user_id}', end='')
-
-            create_keyboard()
-            vk_mess.messages.send(
-                peer_id=event.user_id,
-                random_id=get_random_id(),
-                keyboard=keyboard.get_keyboard(),
-                message='Пример клавиатуры'
-            )
+            bot.new_messages(event.user_id, event.text)
             print('Text: ', event.text)

@@ -2,14 +2,24 @@ import requests
 import bs4
 
 
+def create_start_keyboard():
+    keyboard = VkKeyboard(one_time=False)
+    keyboard.add_button('Регистрация', color=VkKeyboardColor.POSITIVE)
+    return keyboard
+    # keyboard.add_button('Белая кнопка', color=VkKeyboardColor.DEFAULT)
+    # keyboard.add_button('Зелёная кнопка', color=VkKeyboardColor.POSITIVE)
+
+    # keyboard.add_line()  # Переход на вторую строку
+    # keyboard.add_button('Белая кнопка', color=VkKeyboardColor.DEFAULT)
+    # keyboard.add_button('Зелёная кнопка', color=VkKeyboardColor.POSITIVE)
+
+
 class VkBot:
-
-    def __init__(self, user_id):
-        print("Создан объект бота!")
-        self._USER_ID = user_id
+    def __init__(self, vk):
+        self.vk = vk
+        self.start_keyboard = create_start_keyboard()
         self._USERNAME = self._get_user_name_from_vk_id(user_id)
-
-        self._COMMANDS = ["ПРИВЕТ", "ПОГОДА", "ВРЕМЯ", "ПОКА"]
+        self._COMMANDS = ["РЕГИСТРАЦИЯ"]
 
     def _get_user_name_from_vk_id(self, user_id):
         request = requests.get("https://vk.com/id" + str(user_id))
@@ -18,35 +28,6 @@ class VkBot:
         user_name = self._clean_all_tag_from_str(bs.findAll("title")[0])
 
         return user_name.split()[0]
-
-    def _get_time(self):
-        request = requests.get("https://my-calend.ru/date-and-time-today")
-        b = bs4.BeautifulSoup(request.text, "html.parser")
-        return self._clean_all_tag_from_str(str(b.select(".page")[0].findAll("h2")[1])).split()[1]
-
-    # Получение погоды
-    def _get_weather(city: str = "санкт-петербург") -> list:
-        request = requests.get("https://sinoptik.com.ru/погода-" + city)
-        b = bs4.BeautifulSoup(request.text, "html.parser")
-
-        p3 = b.select('.temperature .p3')
-        weather1 = p3[0].getText()
-        p4 = b.select('.temperature .p4')
-        weather2 = p4[0].getText()
-        p5 = b.select('.temperature .p5')
-        weather3 = p5[0].getText()
-        p6 = b.select('.temperature .p6')
-        weather4 = p6[0].getText()
-        result = ''
-        result = result + ('Утром :' + weather1 + ' ' + weather2) + '\n'
-        result = result + ('Днём :' + weather3 + ' ' + weather4) + '\n'
-        temp = b.select('.rSide .description')
-        weather = temp[0].getText()
-        result = result + weather.strip()
-
-        return result
-
-    # Метод для очистки от ненужных тэгов
 
     @staticmethod
     def _clean_all_tag_from_str(string_line):
@@ -69,23 +50,16 @@ class VkBot:
 
         return result
 
-    def new_message(self, message):
-
-        # Привет
+    def new_message(self, user_id, message):
         if message.upper() == self._COMMANDS[0]:
             return f"Привет-привет, {self._USERNAME}!"
-
-        # Погода
-        elif message.upper() == self._COMMANDS[1]:
-            return self._get_weather()
-
-        # Время
-        elif message.upper() == self._COMMANDS[2]:
-            return self._get_time()
-
-        # Пока
-        elif message.upper() == self._COMMANDS[3]:
-            return f"Пока-пока, {self._USERNAME}!"
-
         else:
             return "Не понимаю о чем вы..."
+
+    def send_message(self, user_id, messages='', keyboard=None):
+        self_vk.messages.send(
+            peer_id=user_id,
+            random_id=get_random_id(),
+            keyboard=keyboard,
+            message=messages
+        )
