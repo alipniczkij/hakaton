@@ -78,12 +78,16 @@ class VkBot:
         self.save_massage(user_id, message)
 
         if message.upper() == self._COMMANDS[0]:
+            if in_system:
+              return
             self.send_message(user_id=user_id, messages="Введите кодовое слово")
         elif message.upper() == self._COMMANDS[1]:
             self.login_user(user_id)
+            self.send_message(messages='Введите запрос:', user_id=user_id)
         else:
             answer = classify(message)
             self.send_message(messages='Класс - ' + str(answer[0]), user_id=user_id)
+            self.send_message(messages='Введите запрос:', user_id=user_id)
 
     def send_message(self, user_id, messages='', keyboard=None):
         if keyboard:
