@@ -23,7 +23,6 @@ class VkBot:
     def __init__(self, vk):
         self.vk = vk
         self.start_keyboard = create_start_keyboard('Регистрация')
-        # self._USERNAME = self._get_user_name_from_vk_id(user_id)
         self._COMMANDS = ["РЕГИСТРАЦИЯ", "ВАФЛЯ"]
 
     def _get_user_name_from_vk_id(self, user_id):
@@ -55,10 +54,13 @@ class VkBot:
 
         return result
 
-    def login_user(self, user_id):
+    def login_user(self, user_id, mess):
         in_system = session.query(User).filter_by(user_id=user_id).first()
         if in_system:
-            self.send_message(user_id=user_id, messages="Введите запрос:")
+            answer = classify(mess)
+            answer1 = get_similar(mess)
+            print(answer, answer1)
+            self.send_message(messages='Класс - ' + str(answer[0]) + "\n" + "\n**".join(answer1), user_id=user_id)
         else:
             user = User(user_id)
             session.add(user)
@@ -80,14 +82,18 @@ class VkBot:
 
         if message.upper() == self._COMMANDS[0]:
             if in_system:
-              return
+                self.send_message(user_id=user_id, messages="Вы уже авторизованы!")
+                return
+
             self.send_message(user_id=user_id, messages="Введите кодовое слово")
         elif message.upper() == self._COMMANDS[1]:
-            self.login_user(user_id)
+            self.login_user(user_id, message)
             self.send_message(messages='Введите запрос:', user_id=user_id)
         else:
             answer = classify(message)
-            self.send_message(messages='Класс - ' + str(answer[0]), user_id=user_id)
+            answer1 = get_similar(message)
+            print(answer, answer1)
+            self.send_message(messages='Класс - ' + str(answer[0]) +"\n"+ "\n**".join(answer1), user_id=user_id)
             self.send_message(messages='Введите запрос:', user_id=user_id)
 
     def send_message(self, user_id, messages='', keyboard=None):
