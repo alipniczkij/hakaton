@@ -5,7 +5,6 @@ from functools import lru_cache
 import numpy as np
 import pymorphy2
 from annoy import AnnoyIndex
-import pandas as pd
 
 
 def norm(text):

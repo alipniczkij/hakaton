@@ -6,6 +6,7 @@ import socket
 from multiprocessing import Process, Value
 from time import time, sleep
 from sqlalchemy import create_engine
+import sklearn
 
 engine = create_engine('sqlite:///:memory:', echo=True)
 
@@ -23,17 +24,18 @@ def listen(metric):
                 bot.new_message(event.user_id, event.text)
                 metric.value += 1
 
+
 def send(metric):
-   while True:
-       s = socket.create_connection(('35.204.44.141', 2003))
-       s.sendall(f'hackathon.team2.backend.cnt {metric.value} -1\n'.encode('utf-8'))
-       print(metric.value)
-       metric.value = 0
-       sleep(60)
+    while True:
+        s = socket.create_connection(('35.204.44.141', 2003))
+        s.sendall(f'hackathon.team2.backend.cnt {metric.value} -1\n'.encode('utf-8'))
+        print(metric.value)
+        metric.value = 0
+        sleep(60)
 
 
 metric = Value('i', 0)
-fr = Process(target=listen, args=(metric, ))
-sc = Process(target=send, args=(metric, ))
+fr = Process(target=listen, args=(metric,))
+sc = Process(target=send, args=(metric,))
 fr.start()
 sc.start()
